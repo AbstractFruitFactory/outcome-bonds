@@ -7,7 +7,7 @@ contract OutcomeBondToken is StandardToken {
 
     string public name;
     mapping (address => uint) private backerTokens;
-    address voting;
+    address public voting;
 
     function OutcomeBondToken(string _name, address _votingAddress) public {
         name = _name;
