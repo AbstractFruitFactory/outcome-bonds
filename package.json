@@ -7,8 +7,21 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "truffle test",
+		"node": "truffle develop",
+		"build":" truffle compile && truffle build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexmedkex/outcome-bonds.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexmedkex/outcome-bonds/issues"
+  },
+  "homepage": "https://github.com/alexmedkex/outcome-bonds#readme",
+  "dependencies": {
+    "zeppelin-solidity": "^1.7.0"
+  }
 }
