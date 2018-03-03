@@ -9,7 +9,7 @@
   "scripts": {
     "test": "truffle test",
     "node": "truffle develop",
-    "build": "truffle compile && truffle build"
+    "build": "truffle compile && truffle migrate"
   },
   "repository": {
     "type": "git",

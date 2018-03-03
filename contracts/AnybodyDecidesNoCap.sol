@@ -4,8 +4,6 @@ import '../node_modules/zeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import './IVotingMechanism.sol';
 
 contract AnybodyDecidesNoCap is IVotingMechanism {
-    address private creator;
-    mapping (address => Vote) voteStatus;
     
     function checkVote(address _topic) constant returns (Vote result) {
         return voteStatus[_topic];
