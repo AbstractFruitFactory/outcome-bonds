@@ -6,13 +6,12 @@ import './IVotingMechanism.sol';
 contract AnybodyDecidesNoCap is IVotingMechanism {
     address private creator;
     mapping (address => Vote) voteStatus;
-
     
     function checkVote(address _topic) constant returns (Vote result) {
         return voteStatus[_topic];
     }
     
-    function checkCap(ERC20 _payoutToken, address _subject, address _topic, uint _value) constant returns (bool allowed) {
+    function checkCap(ERC20 _payoutToken, address _topic, uint _value) constant returns (bool allowed) {
         return true;
     }
     

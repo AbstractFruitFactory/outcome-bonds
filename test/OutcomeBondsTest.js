@@ -3,10 +3,15 @@ var OutcomeBondToken = artifacts.require('OutcomeBondToken.sol');
 var Voting = artifacts.require('AnybodyDecidesNoCap.sol');
 
 contract('OutcomeBondToken', function(accounts) {
+    var Vote = {
+        UNKNOWN: 0,
+        MET: 1,
+        NOT_MET: 2
+    };
 
     beforeEach(async function() {
-        this.votingInstance = await Voting.new({from: accounts[0], gas: 4000000});
-        this.tokenInstance = await OutcomeBondToken.new('test', this.votingInstance.address, {from: accounts[0], gas: 4000000});
+        this.votingInstance = await Voting.new({from: accounts[0]});
+        this.tokenInstance = await OutcomeBondToken.new('test', this.votingInstance.address, {from: accounts[0]}); 
     });
 
     it('should create an Outcome Bond.', async function() {
@@ -25,21 +30,17 @@ contract('OutcomeBondToken', function(accounts) {
     });
 
     it('should deduct backer tokens and transfer ether when redeeming backer tokens after voting results in not met.', async function() {
-        await this.tokenInstance.back({ from: accounts[0], value: 100 });
-        let balanceBefore = web3.eth.getBalance(accounts[0]);
-        var Vote = {
-            UNKNOWN: 0,
-            MET: 1,
-            NOT_MET: 2
-        };
-        await this.votingInstance.vote(this.tokenInstance.address, 2, { from: accounts[0]});
-        //let result = await this.tokenInstance.redeemBackerTokens(100, { from: accounts[0] });
-        /*
-        let backerTokens = await this.tokenInstance.getBackerTokenAmount.call(accounts[0]);
-        let balanceAfter = web3.eth.getBalance(accounts[0]);
-        assert.equal(balanceAfter.sub(balanceBefore), 100);
+        var gasUsedInWei = 0;
+        await this.tokenInstance.back({ from: accounts[1], value: 100 });
+        let balanceBefore = web3.eth.getBalance(accounts[1]);
+        await this.votingInstance.vote(this.tokenInstance.address, Vote.NOT_MET, { from: accounts[0]});
+        await this.tokenInstance.redeemBackerTokens(100, { from: accounts[1] }).then(function(result) {
+            gasUsedInWei += result.receipt.cumulativeGasUsed*10**11;
+        });
+        let backerTokens = await this.tokenInstance.getBackerTokenAmount.call(accounts[1]);
+        let balanceAfter = web3.eth.getBalance(accounts[1]);
+        assert.equal(balanceAfter.add(gasUsedInWei).sub(balanceBefore).toString(), '100');
         assert.equal(backerTokens, 0);
-        */
     });
 
 
