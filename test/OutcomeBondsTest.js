@@ -1,6 +1,9 @@
-
+import EVMRevert from '../node_modules/zeppelin-solidity/test/helpers/EVMRevert';
 var OutcomeBondToken = artifacts.require('OutcomeBondToken.sol');
 var Voting = artifacts.require('AnybodyDecidesNoCap.sol');
+require('chai')
+  .use(require('chai-as-promised'))
+  .should();
 
 contract('OutcomeBondToken', function(accounts) {
     var Vote = {
@@ -57,6 +60,13 @@ contract('OutcomeBondToken', function(accounts) {
         });
         let balanceAfter = web3.eth.getBalance(accounts[0]);
         assert.equal(balanceAfter.add(gasUsedInWei).sub(balanceBefore).toString(), '100');
+    });
+
+    it('should not let a user redeem tokens when voting is UNKNOWN', async function() {
+        await this.tokenInstance.back({ from: accounts[0], value: 100 });
+        //await this.tokenInstance.redeemBackerTokens.call(accounts[0]);
+        await this.tokenInstance.redeemBackerTokens(100, { from: accounts[0] }).should.be.rejectedWith(EVMRevert);
+        await this.tokenInstance.redeemRewardTokens(100, { from: accounts[0] }).should.be.rejectedWith(EVMRevert);
     });
 
 
