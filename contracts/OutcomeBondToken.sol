@@ -1,9 +1,10 @@
 pragma solidity ^0.4.17;
 
+import '../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol';
 import '../node_modules/zeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
 import './IVotingMechanism.sol';
 
-contract OutcomeBondToken is StandardToken {
+contract OutcomeBondToken is StandardToken, Ownable {
 
     string public name;
     mapping (address => uint) private backerTokens;
@@ -14,13 +15,13 @@ contract OutcomeBondToken is StandardToken {
         voting = _votingAddress;
     }
 
-    function back() public payable {
+    function back() public payable onlyOwner {
         require(msg.value > 0);
         balances[msg.sender] += msg.value;
         backerTokens[msg.sender] += msg.value;
     }
 
-    function redeemBackerTokens(uint _value) public {
+    function redeemBackerTokens(uint _value) public onlyOwner {
         require(_value > 0);
         require(backerTokens[msg.sender] >= _value);
         IVotingMechanism votingContract = IVotingMechanism(voting);

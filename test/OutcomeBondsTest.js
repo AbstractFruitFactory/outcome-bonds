@@ -29,27 +29,36 @@ contract('OutcomeBondToken', function(accounts) {
         assert.equal(backerTokens, 100);
     });
 
-    it('should deduct backer tokens and transfer ether when redeeming backer tokens after voting results in NOT_MET.', async function() {
+    it('should deduct backer tokens and transfer ether when redeeming backer tokens after voting is NOT_MET.', async function() {
         var gasUsedInWei = 0;
         var gasPrice = 10**11;
-        await this.tokenInstance.back({ from: accounts[1], value: 100 });
-        let balanceBefore = web3.eth.getBalance(accounts[1]);
-        await this.votingInstance.vote(this.tokenInstance.address, Vote.NOT_MET, { from: accounts[0]});
-        await this.tokenInstance.redeemBackerTokens(100, { from: accounts[1], gasPrice: gasPrice }).then(function(result) {
+        await this.tokenInstance.back({ from: accounts[0], value: 100 });
+        let balanceBefore = web3.eth.getBalance(accounts[0]);
+        await this.votingInstance.vote(this.tokenInstance.address, Vote.NOT_MET, { from: accounts[0]}).then(function(result) {
             gasUsedInWei += result.receipt.cumulativeGasUsed*gasPrice;
         });
-        let backerTokens = await this.tokenInstance.getBackerTokenAmount.call(accounts[1]);
-        let balanceAfter = web3.eth.getBalance(accounts[1]);
+        await this.tokenInstance.redeemBackerTokens(100, { from: accounts[0], gasPrice: gasPrice }).then(function(result) {
+            gasUsedInWei += result.receipt.cumulativeGasUsed*gasPrice;
+        });
+        let backerTokens = await this.tokenInstance.getBackerTokenAmount.call(accounts[0]);
+        let balanceAfter = web3.eth.getBalance(accounts[0]);
         assert.equal(balanceAfter.add(gasUsedInWei).sub(balanceBefore).toString(), '100');
         assert.equal(backerTokens, 0);
     });
-/*
-    it('should redeem outcome tokens after voting results in MET.', async function() {
+
+    it('should redeem outcome tokens after voting is MET.', async function() {
+        var gasUsedInWei = 0;
+        var gasPrice = 10**11;
         await this.tokenInstance.back({ from: accounts[0], value: 100 });
-        await this.votingInstance.vote(this.tokenInstance.address, Vote.MET, { from: accounts[0]});
-        await this.tokenInstance.redeemBackerTokens(100, { from: accounts[0] });
+        await this.votingInstance.vote(this.tokenInstance.address, Vote.MET, { from: accounts[0] });
+        let balanceBefore = web3.eth.getBalance(accounts[0]);
+        await this.tokenInstance.redeemRewardTokens(100, { from: accounts[0] }).then(function(result) {
+            gasUsedInWei += result.receipt.cumulativeGasUsed*gasPrice;
+        });
+        let balanceAfter = web3.eth.getBalance(accounts[0]);
+        assert.equal(balanceAfter.add(gasUsedInWei).sub(balanceBefore).toString(), '100');
     });
-    */
+
 
 
 });
