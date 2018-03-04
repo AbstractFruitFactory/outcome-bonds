@@ -10,6 +10,10 @@ contract OutcomeBondToken is StandardToken, Ownable {
     mapping (address => uint) private backerTokens;
     address public voting;
 
+    event Backed(address _backer, uint _value);
+    event RedeemedBackerTokens(address _redeemer, uint _value);
+    event RedeemedRewardTokens(address _redeemer, uint _value);
+
     function OutcomeBondToken(string _name, address _votingAddress) public {
         name = _name;
         voting = _votingAddress;
@@ -19,6 +23,7 @@ contract OutcomeBondToken is StandardToken, Ownable {
         require(msg.value > 0);
         balances[msg.sender] += msg.value;
         backerTokens[msg.sender] += msg.value;
+        Backed(msg.sender, msg.value);
     }
 
     function redeemBackerTokens(uint _value) public onlyOwner {
@@ -28,6 +33,7 @@ contract OutcomeBondToken is StandardToken, Ownable {
         require(votingContract.checkVote(this) == IVotingMechanism.Vote.NOT_MET);
         backerTokens[msg.sender] -= _value;
         msg.sender.transfer(_value);
+        RedeemedBackerTokens(msg.sender, _value);
     }
 
     function redeemRewardTokens(uint _value) public {
@@ -37,6 +43,7 @@ contract OutcomeBondToken is StandardToken, Ownable {
         require(votingContract.checkVote(this) == IVotingMechanism.Vote.MET);
         balances[msg.sender] -= _value;
         msg.sender.transfer(_value);
+        RedeemedRewardTokens(msg.sender, _value);
     }
 
     function getBackerTokenAmount(address owner) view returns (uint) {
